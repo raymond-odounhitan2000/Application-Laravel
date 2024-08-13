@@ -1,0 +1,15 @@
+{
+    "name": "raymond/application-laravel",
+    "autoload": {
+        "psr-4": {
+            "Raymond\\ApplicationLaravel\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "raymond-odounhitan2000",
+            "email": "raymond.odounhitan@epitech.eu"
+        }
+    ],
+    "require": {}
+}
