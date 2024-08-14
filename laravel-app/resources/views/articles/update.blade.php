@@ -6,9 +6,9 @@
 
         @if($errors->any())
             <div class="bg-red-500 text-white p-4 rounded mb-4">
-                <ul text-center>
+                <ul>
                     @foreach($errors->all() as $error)
-                        <li>{{ $error }}</li>
+                        <li text-center>{{ $error }}</li>
                     @endforeach
                 </ul>
             </div>
@@ -36,8 +36,6 @@
                     <option value="Social">Social</option>
                     <option value="Educatif">Educatif</option>
                     <option value="Technique"> Technique</option>
-
-
                 </select>
             </div>
 

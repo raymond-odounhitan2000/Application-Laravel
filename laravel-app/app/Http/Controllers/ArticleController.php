@@ -37,17 +37,14 @@ class ArticleController extends Controller
     public function index(Request $request)
     {
     $sortBy = $request->input('sort_by', 'created_at');
-    if (!in_array($sortBy, ['created_at', 'category']))
-        {
-            $sortBy = 'created_at';
-        }
-        //$articles = Article::with('category')->orderBy($sortBy)->paginate(12);
-        //return view('articles.show', compact('articles'));
+        return view('articles.show', compact('articles'));
     }
 
     public function showAll()
     {
-        $articles = Article::all();
+        $query = Article::query();
+        $query->orderByDesc('created_at');
+        $articles = $query->get();
         return view('articles.show', compact('articles'));
     }
     public function destroy(Article $article)
@@ -63,7 +60,11 @@ class ArticleController extends Controller
     public function edit(Article $article)
     {
         // Affiche le formulaire de modification avec les données de l'article actuel
-        return view('articles.update', compact('article'));
+        if($article->user_id === Auth::id())
+        {
+            return view('articles.update', compact('article'));
+        }
+        return redirect(Route('home'))->with('error','Failed to update this article');
     }
 
     public function update(Request $request, Article $article)

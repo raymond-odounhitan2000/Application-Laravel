@@ -34,7 +34,13 @@
                 </div>
                 <div class="mb-6">
                     <label for="category" class="block text-gray-800 font-bold">Category</label>
-                    <input type="text" name="category" id="category" class="w-full border border-gray-300 py-2 pl-3 rounded mt-2 outline-none focus:ring-indigo-600" />
+                    <select name="category" id="category" class="w-full border border-gray-300 py-2 px-4 rounded mt-2">
+                        <option value="">-- Choose a Category --</option>
+                        <option value="Sport">Sport</option>
+                        <option value="Social">Social</option>
+                        <option value="Educatif">Educatif</option>
+                        <option value="Technique"> Technique</option>
+                    </select>
                     @error('category')
                         <span class="text-red-700">{{ $message }}</span>
                     @enderror

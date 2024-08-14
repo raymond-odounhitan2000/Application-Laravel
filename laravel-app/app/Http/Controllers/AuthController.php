@@ -61,7 +61,7 @@ class AuthController extends Controller
 
     public function forgetPassword()
     {
-        return view('forget-password');
+        return view('forgot-password');
     }
 
     public function forgetPasswordPost(Request $request)
@@ -95,7 +95,8 @@ class AuthController extends Controller
     public function resetPasswordPost(Request $request)
     {
         // Valider les données du formulaire
-        $request->validate([
+        $request->validate(
+        [
             'email' => 'required|email|exists:users',
             'password' => 'required|min:8|max:16|confirmed',
             'password_confirmation'=>'required'
