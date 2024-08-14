@@ -1,5 +1,4 @@
 @vite('resources/css/app.css')
-
 <div class="bg-gray-100 flex h-screen items-center justify-center px-4 sm:px-6 lg:px-8">
     <div class="w-full max-w-md space-y-8">
         @if(session()->has('status'))
@@ -34,14 +33,28 @@
                     @enderror
                 </div>
                 <div class="mb-6">
-                    <label for="category" class="block text-gray-800 font-bold">Category (optional)</label>
+                    <label for="category" class="block text-gray-800 font-bold">Category</label>
                     <input type="text" name="category" id="category" class="w-full border border-gray-300 py-2 pl-3 rounded mt-2 outline-none focus:ring-indigo-600" />
                     @error('category')
                         <span class="text-red-700">{{ $message }}</span>
                     @enderror
                 </div>
-                <button class="cursor-pointer py-2 px-4 block mt-6 bg-indigo-500 text-white font-bold w-full text-center rounded">Create Article</button>
+                <div class="flex space-x-4 justify-between">
+                    <button class='px-4 py-2 text-sm rounded-full font-bold text-white border-2 border-[#007bff] bg-[#007bff] transition-all ease-in-out duration-300 hover:bg-transparent hover:text-[#007bff]'">
+                        Create Article
+                    </button>
+                    <button type="reset" class='px-4 py-2 text-sm rounded-full font-bold text-white border-2 border-[#007bff] bg-[#007bff] transition-all ease-in-out duration-300 hover:bg-transparent hover:text-[#007bff]'">
+                        Reset data
+                    </button>
+                </div>
             </form>
+            <div class="content-center w-full flex justify-center">
+                <a href="{{route('home')}}">
+                    <button class='px-4 py-2 text-sm rounded-full font-bold text-white border-2 border-[#007bff] bg-[#007bff] transition-all ease-in-out duration-300 hover:bg-transparent hover:text-[#007bff]'>
+                        Turn back
+                    </button>
+                </a>
+            </div>
         </div>
     </div>
 </div>

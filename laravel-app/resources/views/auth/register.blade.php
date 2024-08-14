@@ -1,4 +1,4 @@
-@vite('resources/css/app.css')
+@include('partials.header')
 <div class="bg-gray-100 flex h-screen items-center justify-center px-4 sm:px-6 lg:px-8">
     <div class="w-full max-w-md space-y-8">
         @if(session()->has('success'))
@@ -77,3 +77,4 @@
         </div>
     </div>
 </div>
+@include('partials.footer')

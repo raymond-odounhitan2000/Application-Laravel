@@ -5,9 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\RedirectResponse;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
 class AuthController extends Controller
@@ -28,7 +32,7 @@ class AuthController extends Controller
         {
             return redirect(Route('home'));
         }
-        return redirect(route('login'))->with('error','login failed');
+        return redirect(route('login.post'))->with('error','login failed');
     }
 
     public function register()
@@ -55,60 +59,67 @@ class AuthController extends Controller
             return redirect(Route('register'))->with('error','Failed to create account,please try again');
     }
 
-    public function password_forget()
+    public function forgetPassword()
     {
-        return view('auth.forgot-password');
+        return view('forget-password');
     }
 
-    public function password_forgetPost(Request $request)
+    public function forgetPasswordPost(Request $request)
     {
         // Valider l'adresse e-mail
-        $request->validate(['email' => 'required|email']);
-        // Envoyer le lien de réinitialisation de mot de passe
-        $status = Password::sendResetLink($request->only('email'));
-        // Vérifier le statut et rediriger en conséquence
-        return $status === Password::RESET_LINK_SENT
-            ? back()->with(['status' => __($status)])
-            : back()->withErrors(['email' => __($status)]);
+        $request->validate([
+            'email' => 'required|email|exists:users',
+        ]);
+        $token=Str::random(64);
+        DB::table('password_resets')->insert(
+            [
+                'email'=>$request->email,
+                "token"=>$token,
+                'created_at'=> Carbon::now()
+            ]);
+            Mail::send('emails.forget-password',['token'=>$token],function($message) use ($request)
+            {
+                $message->to($request->email);
+                $message->subject("Reset Password");
+            });
+            return redirect()->to(route('forget.password'))->with('success',"We have send an email to reset password");
     }
 
   //Afficher le formulaire de réinitialisation du mot de passe.
-    public function resetpassword(string $token)
+    public function resetPassword(string $token)
     {
-        return view('auth.reset-password', ['token' => $token]);
+        return view('new-password',compact('token'));
     }
 
 
-    public function resetedPassword(Request $request)
+    public function resetPasswordPost(Request $request)
     {
         // Valider les données du formulaire
         $request->validate([
-            'token' => 'required',
-            'email' => 'required|email',
+            'email' => 'required|email|exists:users',
             'password' => 'required|min:8|max:16|confirmed',
+            'password_confirmation'=>'required'
         ]);
         // Réinitialiser le mot de passe
-        $status = Password::reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
-            function ($user, $password) {
-                $user->password = Hash::make($password);
-                $user->save();
+        $updatePassword=DB::table('password_resets')->where(
+            [
+                'email'=>$request->email,
+                'token' => $request->token,
+            ])->first();
+            if(!$updatePassword)
+            {
+                return redirect()->to(route('reset.password'))->with('error',"Invalid");
             }
-        );
-        // Vérifier le statut et rediriger en conséquence
-        return $status === Password::PASSWORD_RESET
-            ? redirect()->route('login')->with('status', __($status))
-            : back()->withErrors(['email' => [__($status)]]);
+            User::where('email',$request->email)->update(['password'=>Hash::make($request->password)]);
+            DB::table('password_resets')->where(['email'=>$request->email])->delete();
+            return redirect()->to(route('login'))->with('success','Your password has been changed');
     }
 
     public function logout(Request $request): RedirectResponse
-{
-    Auth::logout();
-
-    $request->session()->invalidate();
-
-    $request->session()->regenerateToken();
-
-    return redirect('/');
-}
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect('/')->with('success','Successful disconnection');
+    }
 }
